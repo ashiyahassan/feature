@@ -8,7 +8,7 @@ steps:
       - --runtime=python39
       - --region=us-central1
       - --source=.
-      - --entry-point=main
+      - --entry-point=fetch_and_load_crypto_data
       - --trigger-http
       - --allow-unauthenticated
       - --project=$_PROJECT_ID
