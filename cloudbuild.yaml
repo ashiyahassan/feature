@@ -1,16 +1,16 @@
 steps:
-  # Deploy the Cloud Function
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  args:
-    - gcloud
-    - functions
-    - deploy
-    - fetch-and-load-crypto-data
-    - --source=.
-    - --runtime=python310
-    - --entry-point=fetch_and_load_crypto_data
-    - --trigger-http
-    - --allow-unauthenticated
-    - --region=us-central1
-    - --set-env-vars=GCP_PROJECT_ID=${_PROJECT_ID}
-    - --no-gen2
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - functions
+      - deploy
+      - fetch-and-load-crypto-data
+      - --runtime=python39
+      - --region=us-central1
+      - --source=.
+      - --entry-point=main
+      - --trigger-http
+      - --allow-unauthenticated
+      - --project=$_PROJECT_ID
+options:
+  logging: CLOUD_LOGGING_ONLY
