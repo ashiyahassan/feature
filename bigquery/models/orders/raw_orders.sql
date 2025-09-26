@@ -11,7 +11,7 @@ WITH prepared AS (
         order_id,
         DATE(order_date) AS order_date,
         order_name,
-       
+       "dbt" as tool
        FROM
         {{ source('orders_tbl', 'raw_orders') }}
 
