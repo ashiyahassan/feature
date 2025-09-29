@@ -1,0 +1,28 @@
+main:
+  steps:
+    - assign_params:
+        assign:
+          
+          - dbt_cr_url: 'https://dbt-pipeline-runner-1031607702538.us-central1.run.app' 
+          - model: 'orders'
+          - envs: 'dev'
+
+    - call_dbt_run:
+        call: http.get
+        args:
+          url: ${dbt_cr_url}
+          query:
+            # Passes 'simple_model,dev' to the Go program's 'arg1' parameter
+            arg1: ${model + "," + envs} 
+          auth:
+            type: OIDC # Authenticates the workflow's service account to Cloud Run
+        result: dbt_result
+
+    - log_result:
+        call: sys.log
+        args:
+          data: ${dbt_result}
+          severity: INFO
+    
+    - success:
+        return: "DBT job executed for model: ${model}. Check BigQuery for results."

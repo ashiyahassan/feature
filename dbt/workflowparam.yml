@@ -1,0 +1,26 @@
+main:
+  params: [input]
+  steps:
+    - assign_model:
+        assign:
+          - model: ${input.model}
+    
+    - check_envs_provided:
+        switch:
+          - condition: ${"envs" in input}
+            assign:
+              - envs: ${input.envs}
+          - condition: true  # 👈 fallback/default case
+            assign:
+              - envs: "dev"
+
+    - assign_url:
+        assign:
+          - dbt_cr_url: 'https://dbt-pipeline-runner-1031607702538.us-central1.run.app'
+
+    - call_dbt_run:
+        call: http.get
+        args:
+          url: ${dbt_cr_url}
+          query:
+            arg1: ${model + "," + envs}
