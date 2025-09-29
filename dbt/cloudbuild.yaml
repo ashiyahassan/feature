@@ -1,0 +1,28 @@
+# 1. Configuration Variables
+PROJECT_ID=$(gcloud config get-value project)
+REGION="us-central1"               # Use the same region as your BigQuery data set location (if possible)
+SERVICE_NAME="dbt-pipeline-runner" # The name for your Cloud Run service
+REPO_NAME="dbt-poc-repo"           # Artifact Registry Repository name
+
+# 2. Define the image URI
+IMAGE_URI="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$SERVICE_NAME:latest"
+
+# 3. Define the Service Account (Crucial for BigQuery/GCS access)
+# ⚠️ REPLACE with the email of the Service Account you created for this job.
+SERVICE_ACCOUNT_EMAIL="[YOUR-SA-NAME]@[YOUR-PROJECT-ID].iam.gserviceaccount.com"
+
+gcloud artifacts repositories create dbt-poc-repo \
+    --repository-format=docker \
+    --location=us-central1 \
+    --description="Docker repository for dbt on Cloud Run POC"
+	
+gcloud builds submit --tag $IMAGE_URI
+
+gcloud run deploy dbt-pipeline-runner \
+    --image us-central1-docker.pkg.dev/sage-artifact-464909-c3/dbt-poc-repo/dbt-pipeline-runner \
+    --platform managed \
+    --region us-central1 \
+    --allow-unauthenticated \
+    --service-account poc-service-account@sage-artifact-464909-c3.iam.gserviceaccount.com \
+    --cpu-boost \
+    --timeout 3600 # Set a long timeout (up to 60 minutes) for dbt jobs
